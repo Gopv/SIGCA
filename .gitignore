@@ -1,0 +1,12 @@
+# Dependencias de Node
+node_modules/
+sigca-frontend/node_modules/
+sigca-backend/node_modules/
+
+# Base de datos local (Cada compañero tendrá la suya en blanco)
+*.db
+*.db-journal
+
+# Variables de entorno y producción
+.env
+dist/
