@@ -75,7 +75,7 @@ async function inicializarBaseDatosLocal() {
         // 4. Verificación INDEPENDIENTE de Unidades e Insumos base (En cero absoluto)
         const unidadCheck = await dbGet("SELECT COUNT(*) as count FROM unidades_medida");
         if (unidadCheck.count === 0) {
-            await dbRun(`INSERT INTO unidades_medida (id_unidad, sigla, text) VALUES (1, 'KG', 'Kilogramos'), (2, 'UNID', 'Unidades')`);
+            await dbRun(`INSERT INTO unidades_medida (id_unidad, sigla, nombre) VALUES (1, 'KG', 'Kilogramos'), (2, 'UNID', 'Unidades')`);
             await dbRun(`INSERT INTO insumos (nombre, id_categoria, id_unidad) VALUES 
                 ('Arroz Blanco', 1, 1),
                 ('Pollo Beneficiado', 2, 1),
