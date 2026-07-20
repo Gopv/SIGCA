@@ -11,7 +11,8 @@ import {
     verificarEstudianteLocal, 
     registrarEstudianteLocal,
     consumirCupoComedor,
-    vaciarEstudiantesLocal
+    vaciarEstudiantesLocal,
+    consultarARSE // <-- NUEVO: Importamos la función de extracción de ARSE
 } from '../controllers/taquilla.controller.js';
 
 const router = Router();
@@ -31,5 +32,6 @@ router.post('/taquilla/verificar', verificarEstudianteLocal);
 router.post('/taquilla/registrar', registrarEstudianteLocal);
 router.post('/taquilla/consumir', consumirCupoComedor);
 router.post('/taquilla/vaciar', vaciarEstudiantesLocal);
+router.get('/taquilla/arse/:cedula', consultarARSE); // <-- NUEVO: Ruta habilitada para el Frontend
 
 export default router;

@@ -5,24 +5,28 @@
       
       <div>
         <label class="block text-xs font-medium text-gray-600 mb-1">Agrupación / Categoría</label>
-        <select v-model="categoriaSeleccionada" class="w-full border p-2 rounded-lg outline-none text-sm focus:ring-2 focus:ring-blue-500">
-          <option value="" disabled>Seleccione...</option>
-          <option v-for="cat in catalogos.categorias" :key="cat.id_categoria" :value="cat.id_categoria">{{ cat.nombre }}</option>
+        <select v-model="categoriaSeleccionada" class="w-full border p-2 rounded-lg outline-none text-sm focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 font-semibold">
+          <option value="" disabled class="text-gray-500 font-normal">Seleccione...</option>
+          <option v-for="cat in catalogos.categorias" :key="cat.id_categoria" :value="cat.id_categoria" class="text-gray-900 font-medium">
+            {{ cat.nombre }}
+          </option>
         </select>
       </div>
       
       <div>
         <label class="block text-xs font-medium text-gray-600 mb-1">Insumo Específico</label>
-        <select v-model="formulario.id_insumo" required :disabled="!categoriaSeleccionada" class="w-full border p-2 rounded-lg outline-none text-sm focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50">
-          <option value="" disabled>Seleccione insumo...</option>
-          <option v-for="insumo in insumosFiltrados" :key="insumo.id_insumo" :value="insumo.id_insumo">{{ insumo.nombre }}</option>
+        <select v-model="formulario.id_insumo" required :disabled="!categoriaSeleccionada" class="w-full border p-2 rounded-lg outline-none text-sm focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 font-semibold disabled:bg-gray-100 disabled:text-gray-400 disabled:font-normal">
+          <option value="" disabled class="text-gray-500 font-normal">Seleccione insumo...</option>
+          <option v-for="insumo in insumosFiltrados" :key="insumo.id_insumo" :value="insumo.id_insumo" class="text-gray-900 font-medium">
+            {{ insumo.nombre }}
+          </option>
         </select>
       </div>
       
       <div class="flex gap-2">
         <div class="flex-1">
           <label class="block text-xs font-medium text-gray-600 mb-1">Masa / Volumen</label>
-          <input type="number" v-model.number="formulario.amount" min="0.01" step="0.01" required class="w-full border p-2 rounded-lg outline-none text-sm focus:ring-2 focus:ring-blue-500" placeholder="0.00" />
+          <input type="number" v-model.number="formulario.amount" min="0.01" step="0.01" required class="w-full border p-2 rounded-lg outline-none text-sm focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 font-semibold placeholder:text-gray-500 placeholder:font-normal" placeholder="0.00" />
         </div>
         <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 rounded-lg h-9.5 transition-colors text-sm self-end">Guardar</button>
       </div>

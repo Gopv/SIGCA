@@ -27,7 +27,7 @@
           @click="pestañaActual = 'registrar'" 
           :class="['px-4 py-2 rounded-lg text-xs font-bold transition-colors', pestañaActual === 'registrar' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
         >
-          ➕ Conectar / Registrar Manual Estudiantes Unellez
+          ➕ Conectar / Registrar Estudiantes Unellez
         </button>
       </div>
 
@@ -39,6 +39,7 @@
       </button>
     </div>
 
+    <!-- PESTAÑA 1: VERIFICAR ESTUDIANTE -->
     <div v-if="pestañaActual === 'verificar'">
       <form @submit.prevent="consultarLocal" class="flex gap-3 mb-6">
         <input 
@@ -46,7 +47,7 @@
           v-model="busquedaCedula" 
           placeholder="Ingrese cédula a verificar localmente (Ej: 26611174)" 
           required 
-          class="flex-1 border p-2.5 rounded-lg outline-none text-sm font-mono tracking-wider focus:ring-2 focus:ring-blue-500"
+          class="flex-1 border p-2.5 rounded-lg outline-none text-sm font-mono tracking-wider focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 font-semibold placeholder:text-gray-500 placeholder:font-normal"
         />
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 rounded-lg text-sm transition-colors">
           Buscar
@@ -89,44 +90,60 @@
       </div>
     </div>
 
+    <!-- PESTAÑA 2: CONECTAR / REGISTRAR -->
     <div v-if="pestañaActual === 'registrar'">
       <form @submit.prevent="guardarEstudianteManual" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">Cédula de Identidad</label>
-          <input type="text" v-model="formEstudiante.cedula" required class="w-full border p-2 rounded-lg text-sm outline-none font-mono" placeholder="Ej: 26611174" />
+        
+        <!-- Cédula con Botón de Auto-Fetch ARSE (Real) -->
+        <div class="col-span-1 md:col-span-3 flex gap-2 items-end border-b pb-4 mb-2">
+          <div class="flex-1">
+            <label class="block text-xs font-medium text-blue-800 mb-1">Cédula de Identidad (Conexión ARSE)</label>
+            <input type="text" v-model="formEstudiante.cedula" required class="w-full border-2 border-blue-200 p-2 rounded-lg text-sm outline-none font-mono bg-white text-gray-900 font-bold placeholder:text-gray-400 focus:border-blue-500" placeholder="Ej: 26611174" />
+          </div>
+          <button 
+            type="button" 
+            @click="extraerDatosARSE" 
+            :disabled="cargandoARSE || !formEstudiante.cedula"
+            class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-4 py-2.5 rounded-lg text-sm transition-colors shadow-sm disabled:bg-gray-400 flex items-center gap-2"
+          >
+            <span v-if="cargandoARSE">⏳ Consultando...</span>
+            <span v-else>📡 Extraer de ARSE</span>
+          </button>
         </div>
+
+        <!-- Campos Restantes -->
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Nombres</label>
-          <input type="text" v-model="formEstudiante.nombres" required class="w-full border p-2 rounded-lg text-sm outline-none" placeholder="Ej: Gabriel Omar" />
+          <input type="text" v-model="formEstudiante.nombres" required class="w-full border p-2 rounded-lg text-sm outline-none bg-white text-gray-900 font-semibold placeholder:text-gray-500 placeholder:font-normal" placeholder="Nombres" />
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Apellidos</label>
-          <input type="text" v-model="formEstudiante.apellidos" required class="w-full border p-2 rounded-lg text-sm outline-none" placeholder="Ej: Perez Valencia" />
+          <input type="text" v-model="formEstudiante.apellidos" required class="w-full border p-2 rounded-lg text-sm outline-none bg-white text-gray-900 font-semibold placeholder:text-gray-500 placeholder:font-normal" placeholder="Apellidos" />
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Carrera</label>
-          <input type="text" v-model="formEstudiante.carrera" class="w-full border p-2 rounded-lg text-sm outline-none" placeholder="Ej: INGENIERIA INFORMATICA" />
+          <input type="text" v-model="formEstudiante.carrera" class="w-full border p-2 rounded-lg text-sm outline-none bg-white text-gray-900 font-semibold placeholder:text-gray-500 placeholder:font-normal" placeholder="Carrera" />
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Semestre / Trayecto</label>
-          <input type="text" v-model="formEstudiante.semestre" class="w-full border p-2 rounded-lg text-sm outline-none" placeholder="Ej: 8vo" />
+          <input type="text" v-model="formEstudiante.semestre" class="w-full border p-2 rounded-lg text-sm outline-none bg-white text-gray-900 font-semibold placeholder:text-gray-500 placeholder:font-normal" placeholder="Semestre" />
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Período Lectivo</label>
-          <input type="text" v-model="formEstudiante.periodo_lectivo" class="w-full border p-2 rounded-lg text-sm outline-none" placeholder="Ej: 2026-I" />
+          <input type="text" v-model="formEstudiante.periodo_lectivo" class="w-full border p-2 rounded-lg text-sm outline-none bg-white text-gray-900 font-semibold placeholder:text-gray-500 placeholder:font-normal" placeholder="Período" />
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Condición Académica</label>
-          <select v-model="formEstudiante.condicion" class="w-full border p-2 rounded-lg text-sm outline-none">
-            <option value="ACTIVO">ACTIVO</option>
-            <option value="INACTIVO">INACTIVO</option>
+          <select v-model="formEstudiante.condicion" class="w-full border p-2 rounded-lg text-sm outline-none bg-white text-gray-900 font-semibold">
+            <option value="ACTIVO" class="text-gray-900 font-medium">ACTIVO</option>
+            <option value="INACTIVO" class="text-gray-900 font-medium">INACTIVO</option>
           </select>
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Estatus Inicial de Cupo</label>
-          <select v-model="formEstudiante.cupo_comedor" class="w-full border p-2 rounded-lg text-sm outline-none">
-            <option value="DISPONIBLE">DISPONIBLE</option>
-            <option value="CONSUMIDO">YA CONSUMIÓ CUPO COMEDOR</option>
+          <select v-model="formEstudiante.cupo_comedor" class="w-full border p-2 rounded-lg text-sm outline-none bg-white text-gray-900 font-semibold">
+            <option value="DISPONIBLE" class="text-gray-900 font-medium">DISPONIBLE</option>
+            <option value="CONSUMIDO" class="text-gray-900 font-medium">YA CONSUMIÓ CUPO COMEDOR</option>
           </select>
         </div>
         <div class="flex items-end">
@@ -150,12 +167,46 @@ const pestañaActual = ref('verificar');
 const busquedaCedula = ref('');
 const resultadoBusqueda = ref(null);
 const mensajeRegistro = ref('');
+const cargandoARSE = ref(false);
 
 const formEstudiante = ref({
   cedula: '', nombres: '', apellidos: '', carrera: '', semestre: '', periodo_lectivo: '', condicion: 'ACTIVO', cupo_comedor: 'DISPONIBLE'
 });
 
 const token = localStorage.getItem('token_comedor');
+
+// --- EXTRACCIÓN REAL MEDIANTE BACKEND ---
+const extraerDatosARSE = async () => {
+  if (!formEstudiante.value.cedula) return;
+  cargandoARSE.value = true;
+  
+  try {
+    // Aquí hace la petición real a tu backend para que él haga el web scraping a la página de ARSE
+    const res = await fetch(`http://localhost:3000/api/inventario/taquilla/arse/${formEstudiante.value.cedula}`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    const data = await res.json();
+    
+    if (res.ok && data.exito) {
+      // Autocompleta los campos con los datos reales que devolvió tu servidor
+      formEstudiante.value.nombres = data.datos.nombres || '';
+      formEstudiante.value.apellidos = data.datos.apellidos || '';
+      formEstudiante.value.carrera = data.datos.carrera || '';
+      formEstudiante.value.semestre = data.datos.semestre || '';
+      formEstudiante.value.periodo_lectivo = data.datos.periodo_lectivo || '';
+      formEstudiante.value.condicion = data.datos.condicion || 'ACTIVO';
+    } else {
+      alert(data.mensaje || "Error: No se pudo localizar al estudiante en ARSE.");
+    }
+  } catch (error) {
+    console.error("Error conectando con el backend para ARSE:", error);
+    alert("Error de red: No se pudo conectar con el servidor backend para extraer los datos.");
+  } finally {
+    cargandoARSE.value = false;
+  }
+};
 
 const consultarLocal = async () => {
   if (!busquedaCedula.value) return;
